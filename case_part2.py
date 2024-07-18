@@ -3,6 +3,7 @@ from datetime import datetime
 import csv
 
 def main():
+    #the newest version of xlrd no longer supporting xlsx file
     data = xlrd.open_workbook("data.xls")
     sh = data.sheet_by_index(0)
     transaction = 0
@@ -21,14 +22,16 @@ def main():
         if time <= timeslot:
             transaction = transaction + 1
             sales = sales + sh.row(rx)[1].value
-            
+        
+        #save & reset    
         if time > timeslot:
             dict.append((datetime.fromtimestamp(start).strftime("%Y-%m-%dT%H:%M:%S.%fZ"), "{:.2f}".format(sales), transaction))
             sales = sh.row(rx)[1].value
             transaction = 1
             start = timeslot
             timeslot = start + (60*15)
-         
+    
+    #save in csv file   
     with open("case2_data.csv", 'w') as csvfile:
         csv_out=csv.writer(csvfile)
         csv_out.writerow(['Time', 'Sales', 'Transactions'])
